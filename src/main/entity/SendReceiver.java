@@ -284,5 +284,9 @@ public class SendReceiver {
         gate.close();
     }
 
-
+    public Byte receiveByte() throws IOException {
+        byte[] b = new byte[16];
+        is.read(b);
+        return b[0];
+    }
 }
