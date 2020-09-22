@@ -280,6 +280,12 @@ public class SendReceiver {
         return new String(b);
     }
 
+    public byte receiveByte() throws IOException {
+        byte[] b = new byte[16];
+        is.read(b);
+        return b[0];
+    }
+
     public void closeConnection() throws IOException {
         gate.close();
     }
