@@ -1,5 +1,6 @@
 package main.entity;
 
+import main.ArgumentException;
 import main.WrongScriptFileException;
 import main.request.Request;
 
@@ -11,10 +12,10 @@ public class RequestList extends ArrayList<Request> {
     ScriptHistory sHistory = new ScriptHistory();
 
 
-    public void readScriptFromFile(String path) throws IOException , WrongScriptFileException {
-        sHistory.put(path);
+    public void readScriptFromFile(File file) throws IOException, WrongScriptFileException, ArgumentException {
+        sHistory.put(file.getPath());
 
-        BufferedReader reader = new BufferedReader(new FileReader(new File(path)));             //обработать
+        BufferedReader reader = new BufferedReader(new FileReader(file));
 
 
        String line;
@@ -28,12 +29,21 @@ public class RequestList extends ArrayList<Request> {
                    throw new WrongScriptFileException("Ошибка в содержании файла скрипта! Замечена бесконечная рекурсия!");
                }
                else {
-                   readScriptFromFile(arg);
+                   readScriptFromFile(file);
                }
 
            }
            else {
-               Request request = SendReceiver.prepareRequest(line);
+               Request request;
+               try {
+                   request = SendReceiver.prepareRequest(line);
+               } catch (NumberFormatException | ArgumentException ex) {
+                   request = null;
+               }
+               catch (StringIndexOutOfBoundsException ex) {
+                   throw new WrongScriptFileException("Ошибка в содержании файла скрипта");
+               }
+
                if (request == null) {
                    throw new WrongScriptFileException("Ошибка в содержании файла скрипта");
                }

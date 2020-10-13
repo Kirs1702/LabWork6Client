@@ -29,13 +29,15 @@ public class History {
     /**
      * Метод вывода истории в стандартный поток вывода
      */
-    public void show() {
-        System.out.println("История введённых команд:");
+    public String get() {
+        StringBuilder history = new StringBuilder();
+        history.append("История введённых команд:\n");
         for (String line : lines) {
             if (line != null) {
-                System.out.println(line);
+                history.append(line).append("\n");
             }
         }
-
+        return history.toString();
     }
+
 }

@@ -1,6 +1,7 @@
 package main.entity;
 
 
+import main.ArgumentException;
 import main.request.*;
 
 import java.io.*;
@@ -23,7 +24,7 @@ public class SendReceiver {
 
     public SendReceiver(String host, int port) throws IOException {
 
-        gate = new Socket(host, port);                                          //обработать исключение
+        gate = new Socket(host, port);
         os = gate.getOutputStream();
         is = gate.getInputStream();
         isr = new InputStreamReader(is);
@@ -31,22 +32,19 @@ public class SendReceiver {
 
     public <T extends Request> void send(T t) throws IOException {
         oos = new ObjectOutputStream(baos);
-        oos.writeObject(t);                                      //обработать
+        oos.writeObject(t);
         os.write(baos.toByteArray());
         baos.reset();
         baos.close();
         oos.close();
     }
 
-    public static Request prepareRequest(String line) {
+    public static Request prepareRequest(String line) throws ArgumentException {
         if (Pattern.matches("\\s*", line)) {
             return null;
         }
         line = line.trim().replaceAll("\\s+", " ").trim();
-        if (line.split(" ").length > 2) {
-            System.out.println("Команда не может иметь больше одного аргумента!");
-            return null;
-        }
+
         String command = ConsoleReader.prepareCommand(line);
         String arg = ConsoleReader.prepareArg(line);
 
@@ -56,7 +54,7 @@ public class SendReceiver {
         switch (command) {
 
             case "add_if_min" : {
-                if (arg == null){
+                /*if (arg == null){
                     AddIfMinReq request = new AddIfMinReq();
                     request.setRouteName(ConsoleReader.readStringValue(false, 0));
                     request.setCordX(ConsoleReader.readFloatValue("x"));
@@ -86,13 +84,45 @@ public class SendReceiver {
                     return  request;
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
+                }*/
+
+                String pastLine = ConsoleReader.cutFirst(line);
+                AddIfMinReq request = new AddIfMinReq();
+                request.setRouteName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setCordX(Float.parseFloat(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setCordY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+
+
+                request.setFromName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setFromX(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setFromY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+
+                request.setToName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setToX(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setToY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setDistance(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setNewId(Long.parseLong(ConsoleReader.prepareCommand(pastLine)));
+
+                if((request.getCordY() < -861) || request.getFromName().length() > 366 || request.getToName().length() > 366 || request.getDistance() <= 1) {
+                    throw new ArgumentException("Неверно составлен файл!");
                 }
+                return  request;
+
             }
 
             case  "add" : {
-                if (arg == null){
+                /*if (arg == null){
                     AddReq request = new AddReq();
                     request.setRouteName(ConsoleReader.readStringValue(false, 0));
                     request.setCordX(ConsoleReader.readFloatValue("x"));
@@ -121,9 +151,37 @@ public class SendReceiver {
                     return  request;
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
+                }*/
+                String pastLine = ConsoleReader.cutFirst(line);
+                AddReq request = new AddReq();
+                request.setRouteName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setCordX(Float.parseFloat(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setCordY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+
+
+                request.setFromName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setFromX(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setFromY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+
+                request.setToName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setToX(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setToY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setDistance(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+
+                if((request.getCordY() < -861) || request.getFromName().length() > 366 || request.getToName().length() > 366 || request.getDistance() <= 1) {
+                    throw new ArgumentException("Неверно составлен файл!");
                 }
+                return  request;
             }
 
             case "clear" : {
@@ -131,8 +189,7 @@ public class SendReceiver {
                     return  new ClearReq();
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }            }
 
             case "filter_contains_name" : {
@@ -150,8 +207,7 @@ public class SendReceiver {
                     return  new HelpReq();
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }
             }
 
@@ -160,8 +216,7 @@ public class SendReceiver {
                     return  new InfoReq();
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }
             }
 
@@ -170,8 +225,7 @@ public class SendReceiver {
                     return  new PrintAscendingReq();
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }
             }
 
@@ -180,8 +234,7 @@ public class SendReceiver {
                     return new RemoveAllByDistanceReq(Integer.parseInt(arg));
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }
             }
 
@@ -190,21 +243,23 @@ public class SendReceiver {
                     return new RemoveByIdReq(Long.parseLong(arg));
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }
             }
 
             case "remove_greater" : {
-                if (arg == null){
-
+                if (arg != null){
                     RemoveGreaterReq request = new RemoveGreaterReq();
-                    request.setId(ConsoleReader.readLongValue());
+                    try {
+                        request.setId(Long.parseLong(arg));
+                    }
+                    catch (NumberFormatException ex) {
+                        throw new ArgumentException("Неверный аргумент команды!");
+                    }
                     return  request;
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }
             }
 
@@ -213,13 +268,12 @@ public class SendReceiver {
                     return  new ShowReq();
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }
             }
 
             case "update" : {
-                if (arg != null && Pattern.matches("[0-9]{1,10}", arg)) {
+                /*if (arg != null && Pattern.matches("[0-9]{1,10}", arg)) {
 
                     UpdateReq request = new UpdateReq(Long.parseLong(arg));
                     request.setRouteName(ConsoleReader.readStringValue(false, 0));
@@ -249,9 +303,39 @@ public class SendReceiver {
                     return  request;
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
+                }*/
+                String pastLine = ConsoleReader.cutFirst(line);
+                UpdateReq request = new UpdateReq();
+                request.setRouteName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setCordX(Float.parseFloat(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setCordY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+
+
+                request.setFromName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setFromX(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setFromY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+
+                request.setToName(ConsoleReader.prepareCommand(pastLine));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setToX(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setToY(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setDistance(Integer.parseInt(ConsoleReader.prepareCommand(pastLine)));
+                pastLine = ConsoleReader.cutFirst(pastLine);
+                request.setId(Long.parseLong(ConsoleReader.prepareCommand(pastLine)));
+
+                if((request.getCordY() < -861) || request.getFromName().length() > 366 || request.getToName().length() > 366 || request.getDistance() <= 1) {
+                    throw new ArgumentException("Неверно составлен файл!");
                 }
+                return  request;
             }
 
             case "execute_script" : {
@@ -259,15 +343,13 @@ public class SendReceiver {
                     return new ExecuteScriptReq(arg);
                 }
                 else {
-                    System.out.println(message + command);
-                    return  null;
+                    throw new ArgumentException("Неверный аргумент команды!");
                 }
 
             }
 
             default : {
-                System.out.println("Неизвестная команда: " + command);
-                return null;
+                throw new ArgumentException("Неизвестная команда!");
             }
         }
 
@@ -278,6 +360,15 @@ public class SendReceiver {
         byte[] b = new byte[8192];
         is.read(b);
         return new String(b);
+    }
+
+    public RouteSet receiveRouteSet() throws IOException, ClassNotFoundException {
+        byte[] b = new byte[32768];
+        is.read(b);
+        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(b));
+        Object o = ois.readObject();
+        return (RouteSet) o;
+
     }
 
     public void closeConnection() throws IOException {

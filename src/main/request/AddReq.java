@@ -1,23 +1,44 @@
 package main.request;
+
+import main.entity.Route;
+
 public class AddReq extends Request {
 
     private String routeName;
     private float cordX;
     private int cordY;
 
-
     private boolean noAddFrom = false;
     private int fromX;
     private int fromY;
     private String fromName;
+
     private int toX;
     private  int toY;
     private  String toName;
+
     private int distance;
 
 
     public AddReq(){
         super("add");
+    }
+
+    public AddReq(Route route) {
+        super("add");
+        setRouteName(route.getName());
+        setCordX(route.getCoordinates().getX());
+        setCordY(route.getCoordinates().getY());
+        if (route.getFrom() != null) {
+            setFromX(route.getFrom().getX());
+            setFromY(route.getFrom().getY());
+            setFromName(route.getFrom().getName());
+        } else setNoAddFrom(true);
+        setToX(route.getTo().getX());
+        setToY(route.getTo().getY());
+        setToName(route.getTo().getName());
+        setDistance(route.getDistance());
+
     }
 
     public String getRouteName() {
