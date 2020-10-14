@@ -310,7 +310,7 @@ public class MyFrame  extends JFrame {
             JFileChooser chooser = new JFileChooser();
             chooser.setCurrentDirectory(new File("C:\\Users\\Kirill\\Desktop\\scripts"));
             File script = null;
-            int ret = chooser.showDialog(null, "Открыть файл");
+            int ret = chooser.showDialog(null, "");
             if (ret == JFileChooser.APPROVE_OPTION) {
                 script = chooser.getSelectedFile();
             }

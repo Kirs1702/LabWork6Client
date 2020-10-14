@@ -29,7 +29,7 @@ public class RequestList extends ArrayList<Request> {
                    throw new WrongScriptFileException("Ошибка в содержании файла скрипта! Замечена бесконечная рекурсия!");
                }
                else {
-                   readScriptFromFile(file);
+                   readScriptFromFile(new File(arg));
                }
 
            }

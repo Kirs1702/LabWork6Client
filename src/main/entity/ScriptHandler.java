@@ -20,7 +20,8 @@ public class ScriptHandler {
             reqList.readScriptFromFile(file);
         }
         catch (WrongScriptFileException ex) {
-            System.out.println("Данный скрипт или один из вложенных в него составлен неверно!");
+            System.out.println(ex.getMessage());
+            return;
         } catch (ArgumentException e) {
             e.printStackTrace();
         }
